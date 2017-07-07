@@ -3,6 +3,7 @@
 var fs     = require('fs');
 var Stream = require('stream').Stream;
 var utils  = require('haraka-utils');
+var logger = require('./logger');
 
 var ChunkEmitter = require('./chunkemitter');
 
@@ -25,7 +26,7 @@ class MessageStream extends Stream {
         this._queue = [];
         this.max_data_inflight = 0;
         this.buffer_max = (!isNaN(config.main.spool_after) ?
-                        Number(config.main.spool_after) : -1);
+            Number(config.main.spool_after) : -1);
         this.spooling = false;
         this.fd = null;
         this.open_pending = false;
@@ -330,9 +331,14 @@ MessageStream.prototype.pipe = function (destination, options) {
     this.dot_stuffing = ((options && options.dot_stuffing) ? options.dot_stuffing : false);
     this.ending_dot   = ((options && options.ending_dot) ? options.ending_dot : false);
     this.clamd_style  = ((options && options.clamd_style) ? true : false);
-    this.buffer_size  = ((options && options.buffer_size) ? options.buffer_size : 1024 * 64);
+    this.buffer_size  = ((options && options.buffer_size) ? options.buffer_size : 2048 * 64);
     this.start        = ((options && parseInt(options.start)) ? parseInt(options.start) : 0);
     // Reset
+    // Added by shobhit
+    // logger.loginfo(destination);
+    // logger.loginfo(options);
+    // logger.loginfo(JSON.stringify(self));
+
     this.in_pipe = true;
     this.readable = true;
     this.paused = false;
