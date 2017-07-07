@@ -1,2 +1,13 @@
 {
+	dn:uid=testuser, ou=Users, dc=example.com, dc=com
+	objectClass: inetLocalMailRecipient
+	uid: testuser
+	cn:Test user
+	mailLocalAddress: testuser@example.com
+	mailRoutingAddress: testuser@example.com
+
+	dn:uid=testuser, ou=Users, dc=abc.com, dc=com
+	uid:testuser
+	cn:Test user
+	mailLocalAddess: testuser@abc.com
 }
