@@ -1,8 +1,13 @@
 var express =require('express');
 var obj=express();
 var fs=require('fs');
+
 const { URL }=require('url');
 var querystring=require('querystring');
+
+var client = require('twilio')('ACd48d648b0821b35b3e51b0856770c50e', '1bdb70a3ebfe8dea412e5e5e5be9838b');
+
+const readLine=require('readline');
 
 var options={
 	method: 'get',
@@ -57,14 +62,47 @@ obj.post('/home/shobhit/test_record.json', function(req, res){
 			var pubKey=fileObj.key;
 			// console.log(typeof pubKey);
 			var recordObj=JSON.parse(data);
-			var newObj="{\"id\":"+JSON.stringify(fileObj.id)+",\"key\":" +JSON.stringify(pubKey)+"}";
-			recordObj.push(JSON.parse(newObj));
-			console.log(recordObj);
-			fs.writeFile('/home/shobhit/test_record.json', JSON.stringify(recordObj), function(req, res){
+			console.log(fileObj.mobNo);
+			var newObj="{\"id\":"+JSON.stringify(fileObj.id)+",\"key\":" +JSON.stringify(pubKey)+", \"mobNo\":\""+fileObj.mobNo+"\"}";
+
+			var rNum=Math.floor(Math.random()*(9999-1000+1)+1000);
+			var mes="\'"+rNum.toString()+"\'";
+			var num="\'"+fileObj.mobNo.toString()+"\'";
+			// console.log(mes);
+			console.log(num);
+			client.messages.create({
+				from: '+13127641385',
+				to: num,
+			  	body: mes
+			}, function(err, message){
 				if(err)	throw err;
-				console.log("New public key has been added to the record.");
-			});
-			res.send('Data Received');
+				console.log(message.sid);
+
+				const readInterface=readLine.createInterface({
+					input:process.stdin,
+					output:process.stdout
+				});
+
+				readInterface.question('Enter OTP: ', (answer)=>{
+					if(rNum==parseInt(answer)){
+						console.log("Authentication Completed");
+					}
+					else{
+						console.log("Authentication Failed");
+						process.exit();
+					}
+					recordObj.push(JSON.parse(newObj));
+					console.log(recordObj);
+					fs.writeFile('/home/shobhit/test_record.json', JSON.stringify(recordObj), function(req, res){
+						if(err)	throw err;
+						console.log("New public key has been added to the record.");
+					});
+					res.send('Data Received');
+					readInterface.close();
+				});
+
+			});	
+
 		});
 	});
 })
