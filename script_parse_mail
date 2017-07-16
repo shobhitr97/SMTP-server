@@ -1,0 +1,1 @@
+tail -n +3 Encrypted | sed '/From/,$!d' | tail -n +4 | head -n -1 > Decrypted
